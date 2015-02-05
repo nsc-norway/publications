@@ -15,13 +15,16 @@ if sys.stdout.encoding == 'US-ASCII':
 
 
 # Main function 
-def add_entry(doi = None):
+def add_entry(doc_id = None):
 
   print ""
   print "Add a publication to the database"
   print ""
 
-  record = get_info(doi)
+  if not doc_id:
+    doc_id = raw_input("Enter DOI or PubMed ID, or blank to skip: ")
+
+  record = get_info(doc_id)
   print ""
 
   duplicate = pubdb.check_duplicates(record)
@@ -39,60 +42,54 @@ def add_entry(doi = None):
 
 
 # Data entry routine
-def get_info(doi):
-  record = {"authors":"", "year":"", "title":"", "journal":"", "doi":"", "pubmed":""} 
-  pmid = None
-
-  if not doi:
-    doi = raw_input("Enter DOI, or blank for no DOI: ")
+def get_info(doc_id):
+  record = {"authors":"", "year":"", "title":"", "journal":"", "doi":"", "pubmed":"", "source":""}
   
-  if len(doi.strip()) > 0:
+  if doc_id != "":
+    doi = None
     try:
-      print "Querying CrossRef..."
-      doi_data = get_info_from_doi(doi)
-      for k,v in doi_data.items():
-        record[k] = v
-    except Exception as e:
-      print e
-      print ""
-      abort = raw_input("Abort? [y]")
-      if abort == "" or abort == "y":
-        sys.exit(1) 
-      record['doi'] = doi
-  else: # no doi
-    pmid = raw_input("Enter PubMed ID, or blank for none: ")
-  
-  # Look up pubmed info, either with DOI or PMID
-  if record['doi'] or pmid: 
-    try:
-      print "Querying PubMed..."
-      data = get_info_from_pubmed(pmid, doi)
-      for k,v in data.items():
-        record[k] = v
-    except Exception as e:
-      print e
-      print ""
-      abort = raw_input("Abort? [y]")
-      raise e
-      if abort == "" or abort == "y":
-        sys.exit(1) 
-      record['pubmed'] = pmid
-  
-  manual = False
-  if record['doi'] or record['pubmed']:
-    print " ** Retrieved publication data ** "
-    print ""
-    pubdb.print_record(record)
-    print ""
+      pmid = str(int(doc_id)) # if numeric, assume PMID
+    except ValueError:
+      doi = doc_id # otherwise, it's a DOI
+ 
+    if doi:
+      try:
+        pmid = doi_to_pmid(doi)
+      except:
+        pmid = None
 
-    answer = raw_input("Modify this before adding to database? [n] ")
-    if not (answer == "" or answer == "n"):
-      manual = True
+    if pmid:
+      print "Getting info from PubMed..."
+      data = get_info_from_pubmed(pmid)
+      record['source'] = "pubmed"
+    else:
+      print "Getting info from CrossRef..."
+      data = get_info_from_doi(doi)
+      record['source'] = "crossref"
+
+    for k,v in data.items():
+      record[k] = v
+
+    if record['source'] != '':
+      print " ** Retrieved publication data ** "
+      print ""
+      pubdb.print_record(record)
+      print ""
   
-  if manual:
-    record = pubdb.modify_record(record)
-  
-  return record
+      answer = raw_input("Add/modify/cancel (a/m/c) [a] ")
+      if (answer == "" or answer == "a"):
+        manual = False
+      elif answer == "m":
+        manual = True
+      else:
+        print "\nCancelled.\n"
+        sys.exit(1)
+    
+    if manual:
+      record = pubdb.modify_record(record)
+      record['source'] = 'manual'
+    
+    return record
 
 
 
@@ -177,18 +174,18 @@ def pubmed_authors(authors_list):
   return ", ".join(authors)
 
 
+def doi_to_pmid(doi):
+  # http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=10.1021/bi902153g
+  url_doi2pmid = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
+  params = {"db": "pubmed", "term": doi + "[doi]"}
+  r = requests.get(url_doi2pmid, params=params)
+  dom = minidom.parseString(r.text.encode('utf-8'))
+  return dom.getElementsByTagName("Id")[0].childNodes[0].data
+
+
 # PubMed lookup function
 # e.g. http://www.ncbi.nlm.nih.gov/pubmed/?term=20140528&report=xml&format=text
-def get_info_from_pubmed(pmid, doi):
-
-  # First get pubmed ID from DOI (skip this if we have pubmed id)
-  if not pmid:
-    # http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=10.1021/bi902153g
-    url_doi2pmid = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
-    params = {"db": "pubmed", "term": doi + "[doi]"}
-    r = requests.get(url_doi2pmid, params=params)
-    dom = minidom.parseString(r.text.encode('utf-8'))
-    pmid = dom.getElementsByTagName("Id")[0].childNodes[0].data
+def get_info_from_pubmed(pmid):
 
   # http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=20235548
   url_pubmed = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"

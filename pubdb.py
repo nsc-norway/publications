@@ -1,24 +1,29 @@
 import sqlite3
 
 
-record_id = ['authors', 'year', 'title', 'journal', 'doi', 'pubmed']
-columns = ", ".join(record_id)
+record_data = ['authors', 'year', 'title', 'journal', 'doi', 'pubmed', 'source']
+columns = ", ".join(record_data)
 record_name = {
     'authors': 'Authors', 'year':'Year', 'title':'Title', 
-    'journal': 'Journal', 'doi': 'DOI', 'pubmed': 'PubMed ID'}
+    'journal': 'Journal', 'doi': 'DOI', 'pubmed': 'PubMed ID', 
+    'source': 'Source'}
+
+# source can be pubmed / crossref / manual
 
 _conn = False
 
 # Print a publication entry
 def print_record(record):
-  for ri in record_id:
+  for ri in record_data:
     rn = record_name[ri]
     print (rn + ":"), " " * (12-len(rn)), record[ri]
 
 
 # Interactively modify the record data in memory
 def modify_record(record):
-  for ri in record_id:
+  for ri in record_data:
+    if ri == 'source': 
+      continue # don't modify the source
     rn = record_name[ri]
     if record[ri]:
       rd = raw_input(rn + " [" + record[ri] + "]: ")
@@ -43,7 +48,7 @@ def open_db():
     return _conn
   
   # Does not exist
-  create_columns = ", ".join([ri + " TEXT" for ri in record_id])
+  create_columns = ", ".join([ri + " TEXT" for ri in record_data])
   c.execute("CREATE TABLE publications(" + create_columns + ")") 
 
   return _conn
@@ -65,7 +70,7 @@ def add(record):
   conn = open_db()
   c = conn.cursor()
   c.execute("INSERT INTO publications (" + columns + ") VALUES ("\
-     + ",".join([":"+col for col in record_id]) + ")", record)
+     + ",".join([":"+col for col in record_data]) + ")", record)
   conn.commit()
   
 
