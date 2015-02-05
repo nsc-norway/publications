@@ -5,13 +5,13 @@ from xml.dom import minidom
 import sqlite3
 import pubdb
 
-# US ASCII is useless for printing accented letters. This sets 
+# US ASCII is useless for printing accented letters. This sets the encoding of the
+# terminal output to utf-8.
 if sys.stdout.encoding == 'US-ASCII':
   sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
 
 
 # Main function 
-
 def add_entry(doi = None):
 
   print ""
@@ -131,6 +131,7 @@ def format_crossref_authors(contributors):
   return u", ".join(authors)
   
 
+# Main function for looking up a DOI
 # example https://doi.crossref.org/servlet/query?pid=marius.bjornstad@medisin.uio.no&format=unixsd&id=10.3389/fmicb.2015.00017
 def get_info_from_doi(doi):
   params = {"pid": "marius.bjornstad@medisin.uio.no", "format": "unixsd", "id":doi}
@@ -159,7 +160,8 @@ def get_info_from_doi(doi):
   raise Exception("The CrossRef server returned invalid data or an error status")
 
 
-# Takes an XML element (Name="AuthorList")
+# Takes an XML element (Name="AuthorList") as returned by the pubmed (entrez) service
+# Returns a comma separated list of authors
 def pubmed_authors(authors_list):
   authors = []
   for a in authors_list.getElementsByTagName("Item"):
@@ -169,7 +171,7 @@ def pubmed_authors(authors_list):
   return ", ".join(authors)
 
 
-# PubMed lookup functions
+# PubMed lookup function
 # e.g. http://www.ncbi.nlm.nih.gov/pubmed/?term=20140528&report=xml&format=text
 def get_info_from_pubmed(pmid, doi):
 
