@@ -6,7 +6,15 @@ if sys.stdout.encoding == 'US-ASCII':
 
 def get_html():
   html = ''
+  year = "0"
   for record in pubdb.get_records():
+    if record['year'] != year:
+      year = record['year']
+      print '<p class="MsoNormal">&nbsp;</p>'
+      print ''
+      print '<p class="MsoNormal"><b>' + year + '</b></p>'
+      print ''
+
     html += '<p class="MsoNormal" style="margin-left:36.0pt;text-indent:-36.0pt"><span style="mso-ascii-font-family:Cambria;mso-hansi-font-family:Cambria;mso-no-proof:yes">'
     html += record['authors'] + ". " + record['year'] + ". "
     html += record['title'] + '</span><i style="text-indent: -36pt;">' + record['journal'] + '. </i><br/>'

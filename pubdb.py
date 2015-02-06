@@ -1,14 +1,19 @@
 import sqlite3
 
+# Publication tracking database
 
+# These are the columns:
 record_data = ['authors', 'year', 'title', 'journal', 'doi', 'pubmed', 'source']
+# The source field can be pubmed / crossref / manual
+# There is also column ROWID which is created by sqlite, which acts as the primary key
 columns = ", ".join(record_data)
+
+# Display names for the columns
 record_name = {
     'authors': 'Authors', 'year':'Year', 'title':'Title', 
     'journal': 'Journal', 'doi': 'DOI', 'pubmed': 'PubMed ID', 
     'source': 'Source'}
 
-# source can be pubmed / crossref / manual
 
 _conn = False
 
@@ -21,17 +26,22 @@ def print_record(record):
 
 # Interactively modify the record data in memory
 def modify_record(record):
+  new_rec = dict(record)
+  try:
+    new_rec['ROWID'] = record['ROWID']
+  except KeyError:
+    pass
   for ri in record_data:
     if ri == 'source': 
       continue # don't modify the source
     rn = record_name[ri]
     if record[ri]:
-      rd = raw_input(rn + " [" + record[ri] + "]: ")
+      rd = unicode(raw_input(rn + " [" + record[ri] + "]: "), 'utf8')
     else:
-      rd = raw_input(rn + ": ")
+      rd = unicode(raw_input(rn + ": "), 'utf8')
     if rd != "":
-      record[ri] = rd
-  return record
+      new_rec[ri] = rd
+  return new_rec
 
 
 # Open a connection to the database or use an existing one
@@ -54,7 +64,8 @@ def open_db():
   return _conn
 
 
-def check_duplicates(record):
+# Check if this publication is already saved
+def check_exists(record):
   conn = open_db()
   c = conn.cursor()
   for r in c.execute('SELECT '+columns+' FROM publications WHERE doi=?', (record['doi'],)):
@@ -66,6 +77,7 @@ def check_duplicates(record):
   return None
 
 
+# Add a publication to the database
 def add(record):
   conn = open_db()
   c = conn.cursor()
@@ -73,30 +85,50 @@ def add(record):
      + ",".join([":"+col for col in record_data]) + ")", record)
   conn.commit()
   
+# Update a record, identified by the ROWID in the supplied dict record
+def set(record): 
+  conn = open_db()
+  c = conn.cursor()
+  sql = "UPDATE publications SET "
+  values = []
+  for col in record_data:
+    values.append(record[col]) 
+  nval = len(values)
+  assign = ", ".join(rec_id + "=?" for rec_id in record_data)
+  c.execute("UPDATE publications SET " + assign +\
+    " WHERE ROWID=?", tuple(values + [record['ROWID']]))
+  conn.commit()
+  
 
+# Get publications ordered by year
 def get_records():
   conn = open_db()
   c = conn.cursor()
   recs = []
   for row in c.execute("SELECT ROWID," + columns + " FROM publications ORDER BY year DESC"):
     recs.append(row)
-
   return recs
 
+# Get a record identified by ROWID
 def get(row_id):
   conn = open_db()
   c = conn.cursor()
   for row in c.execute("SELECT ROWID," + columns + " FROM publications WHERE ROWID=?", (row_id,)):
     return row
-
   return None
 
-
+# Get a record identified by DOI
 def get_by_doi(doi):
   conn = open_db()
   c = conn.cursor()
   for row in c.execute("SELECT ROWID," + columns + " FROM publications WHERE doi=?", (doi,)):
     return row
-
   return None
+
+def remove(pub_id):
+  conn = open_db()
+  c = conn.cursor()
+  c.execute("DELETE FROM publications WHERE ROWID=?", (pub_id,))
+  conn.commit()
+
 

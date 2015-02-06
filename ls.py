@@ -1,4 +1,7 @@
-import pubdb
+import pubdb, sys, codecs
+
+if sys.stdout.encoding == 'US-ASCII':
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
 
 
 def ls():

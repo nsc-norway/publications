@@ -27,7 +27,7 @@ def add_entry(doc_id = None):
   record = get_info(doc_id)
   print ""
 
-  duplicate = pubdb.check_duplicates(record)
+  duplicate = pubdb.check_exists(record)
   if duplicate:
     print "Record appears to already exist. Existing record:"
     pubdb.print_record(duplicate)
@@ -76,7 +76,7 @@ def get_info(doc_id):
       pubdb.print_record(record)
       print ""
   
-      answer = raw_input("Add/modify/cancel (a/m/c) [a] ")
+      answer = raw_input("Add/modify/cancel [A/m/c] ").lower()
       if (answer == "" or answer == "a"):
         manual = False
       elif answer == "m":
@@ -113,7 +113,7 @@ def get_path_element(base, path):
 
 # Get the text data in an xml tag
 def get_path_data(base, path):
-  return get_path_element(base, path).firstChild
+  return get_path_element(base, path).firstChild.data
 
 
 # Data formatting
@@ -174,6 +174,7 @@ def pubmed_authors(authors_list):
   return ", ".join(authors)
 
 
+# See if the DOI is known in pubmed and get pubmed ID
 def doi_to_pmid(doi):
   # http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=10.1021/bi902153g
   url_doi2pmid = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
