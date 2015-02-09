@@ -29,7 +29,8 @@ def add_entry(doc_id = None):
 
   duplicate = pubdb.check_exists(record)
   if duplicate:
-    print "Record appears to already exist. Existing record:"
+    print ""
+    print "ABORTED. Specified publication is already in database. Existing record:"
     pubdb.print_record(duplicate)
     print ""
   else:
@@ -185,7 +186,6 @@ def doi_to_pmid(doi):
 
 
 # PubMed lookup function
-# e.g. http://www.ncbi.nlm.nih.gov/pubmed/?term=20140528&report=xml&format=text
 def get_info_from_pubmed(pmid):
 
   # http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=20235548
