@@ -2,6 +2,7 @@
 import requests
 import sys, codecs, locale
 from xml.dom import minidom
+import re
 import sqlite3
 import pubdb
 import datetime
@@ -43,7 +44,7 @@ def add_entry(doc_id = None):
 
 
 
-# Data entry routine
+# Main data retrieval routine
 def get_info(doc_id):
   record = pubdb.blank_record()
   
@@ -56,8 +57,10 @@ def get_info(doc_id):
  
     if doi:
       try:
-        pmid = doi_to_pmid(doi)
+        #pmid = doi_to_pmid(doi)
+        pmid = None
       except:
+        print "PubMed doesn't know about this DOI."
         pmid = None
 
     if pmid:
@@ -106,23 +109,29 @@ def get_path_element(base, path):
   elem = base
   for path_component in path:
     found = False
-    for child in elem.childNodes:
-      if child.nodeType == minidom.Node.ELEMENT_NODE and child.tagName == path_component:
-        elem = child
-        found = True
+    if elem:
+      for child in elem.childNodes:
+        if child.nodeType == minidom.Node.ELEMENT_NODE and child.tagName == path_component:
+          elem = child
+          found = True
     if not found:
-      raise Exception("Element " + path_component + " not found in " + str(elem))
+      elem = None
   return elem
 
 
 # Get the text data in an xml tag
 def get_path_data(base, path):
-  return get_path_element(base, path).firstChild.data
+  element = get_path_element(base, path)
+  if element:
+    return element.firstChild.data.strip()
+  else:
+    return None
 
 
 # Data formatting
 def format_author(first, last):
-  return str(last) + " " + str(first)[0:1]
+  initials = re.sub('[a-z. -]', '', first)[0:2]
+  return str(last) + " " + initials
 
 
 # CrossRef DOI lookup functions
@@ -136,6 +145,36 @@ def format_crossref_authors(contributors):
 
   return u", ".join(authors)
   
+
+# Format pages, convert first and last page to a string range
+# Using pubmed's notation where only different digits are shown in the end of
+# the range.
+def format_crossref_pages(pages_element):
+  last = None
+  first = None
+  if pages_element:
+    for ce in pages_element.childNodes:
+      if ce.nodeType == minidom.Node.ELEMENT_NODE:
+        if ce.tagName == "first_page":
+          first = ce.childNodes[0].data
+          print "first page", first
+        elif ce.tagName == "last_page":
+          last = ce.childNodes[0].data
+          print "larst page", last
+  if last and first:
+    i = 0
+    while len(last) > 0 and first[i] == last[0]:
+      last = last[1:]
+      i = i + 1
+    if len(last) > 0:
+      return first + "-" + last
+    else:
+      return first
+  elif first:
+    return first
+  else:
+    return ""
+
 
 # Main function for looking up a DOI
 # example https://doi.crossref.org/servlet/query?pid=marius.bjornstad@medisin.uio.no&format=unixsd&id=10.3389/fmicb.2015.00017
@@ -157,7 +196,10 @@ def get_info_from_doi(doi):
         data["authors"] = format_crossref_authors(get_path_element(article, ["contributors"]))
         data["year"] =    get_path_data(article, ["publication_date", "year"])
         data["title"] =   get_path_data(article, ["titles", "title"])
-        data["journal"] = get_path_data(journal, ["journal_metadata", "abbrev_title"])
+        data["journal_abbrev"] = get_path_data(journal, ["journal_metadata", "abbrev_title"]).replace(".", "")
+        data["journal_full"] = get_path_data(journal, ["journal_metadata", "full_title"])
+        data["volume"] =  get_path_data(journal, ["journal_issue", "journal_volume", "volume"])
+        data["pages"] =   format_crossref_pages(get_path_element(article, ["pages"]))
         data["doi"] =     get_path_data(article, ["doi_data", "doi"])
         return data
       else: # status != resolved

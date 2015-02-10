@@ -4,24 +4,26 @@ import datetime, locale
 # Publication tracking database
 
 # columns and display names
-record_name = {
-    'authors': 'Authors',
-    'title': 'Title', 
-    'journal_full': 'Journal full name',
-    'journal_abbrev': 'Journal abbrev.',
-    'volume': 'Volume',
-    'issue': 'Issue number',
-    'pages': 'Pages',
-    'date': 'Publication date',
-    'epubdate': 'Electr. pub. date',
-    'year': 'Publication year',
-    'doi': 'DOI',
-    'pubmed': 'PubMed ID', 
-    'source': 'Source'}
+record_items = {
+    ('authors', 'Authors'),
+    ('title', 'Title'), 
+    ('journal_full', 'Journal full name'),
+    ('journal_abbrev', 'Journal abbrev.'),
+    ('volume', 'Volume'),
+    ('issue', 'Issue number'),
+    ('pages', 'Pages'),
+    ('date', 'Publication date'),
+    ('epubdate', 'Electr. pub. date'),
+    ('year', 'Publication year'),
+    ('doi', 'DOI'),
+    ('pubmed', 'PubMed ID'), 
+    ('source', 'Source')
+    }
 
 # The source field can be pubmed / crossref / manual
 # There is also column ROWID which is created by sqlite, which acts as the primary key
-record_data = record_name.keys()
+record_name = dict(record_items)
+record_data = [a for (a,b) in record_items]
 columns = ", ".join(record_data)
 
 _conn = False
@@ -144,9 +146,4 @@ def remove(pub_id):
   c.execute("DELETE FROM publications WHERE ROWID=?", (pub_id,))
   conn.commit()
 
-def parse_us_date(date_string, format):
-  locale_tmp = locale.getlocale(locale.LC_TIME)
-  locale.setlocale(locale.LC_TIME, 'en_US') 
-  print datetime.datetime.strptime(date_string, format)
-  locale.setlocale(locale.LC_TIME, locale_tmp) 
 
