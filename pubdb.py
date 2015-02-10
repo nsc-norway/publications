@@ -1,27 +1,40 @@
 import sqlite3
+import datetime, locale
 
 # Publication tracking database
 
-# These are the columns:
-record_data = ['authors', 'year', 'title', 'journal', 'doi', 'pubmed', 'source']
-# The source field can be pubmed / crossref / manual
-# There is also column ROWID which is created by sqlite, which acts as the primary key
-columns = ", ".join(record_data)
-
-# Display names for the columns
+# columns and display names
 record_name = {
-    'authors': 'Authors', 'year':'Year', 'title':'Title', 
-    'journal': 'Journal', 'doi': 'DOI', 'pubmed': 'PubMed ID', 
+    'authors': 'Authors',
+    'title': 'Title', 
+    'journal_full': 'Journal full name',
+    'journal_abbrev': 'Journal abbrev.',
+    'volume': 'Volume',
+    'issue': 'Issue number',
+    'pages': 'Pages',
+    'date': 'Publication date',
+    'epubdate': 'Electr. pub. date',
+    'year': 'Publication year',
+    'doi': 'DOI',
+    'pubmed': 'PubMed ID', 
     'source': 'Source'}
 
+# The source field can be pubmed / crossref / manual
+# There is also column ROWID which is created by sqlite, which acts as the primary key
+record_data = record_name.keys()
+columns = ", ".join(record_data)
 
 _conn = False
+
+def blank_record():
+  return dict((k,'') for k in record_name)
+
 
 # Print a publication entry
 def print_record(record):
   for ri in record_data:
     rn = record_name[ri]
-    print (rn + ":"), " " * (12-len(rn)), record[ri]
+    print (rn + ":"), " " * (17-len(rn)), record[ri]
 
 
 # Interactively modify the record data in memory
@@ -131,4 +144,9 @@ def remove(pub_id):
   c.execute("DELETE FROM publications WHERE ROWID=?", (pub_id,))
   conn.commit()
 
+def parse_us_date(date_string, format):
+  locale_tmp = locale.getlocale(locale.LC_TIME)
+  locale.setlocale(locale.LC_TIME, 'en_US') 
+  print datetime.datetime.strptime(date_string, format)
+  locale.setlocale(locale.LC_TIME, locale_tmp) 
 

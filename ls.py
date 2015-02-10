@@ -7,7 +7,7 @@ if sys.stdout.encoding == 'US-ASCII':
 def ls():
   for record in pubdb.get_records():
     author = record['authors'].split(',')[0]
-    print "%4d %s %-20s %-20s %s" % (record['ROWID'], record['year'], author, record['journal'], record['doi'])
+    print "%4d %s %-20s %-20s %s" % (record['ROWID'], record['year'], author, record['journal_abbrev'], record['doi'])
 
 ls()
 

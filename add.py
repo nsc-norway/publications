@@ -1,9 +1,10 @@
 # coding=utf-8
 import requests
-import sys, codecs
+import sys, codecs, locale
 from xml.dom import minidom
 import sqlite3
 import pubdb
+import datetime
 
 # Script to add an entry to the publications database
 
@@ -44,7 +45,7 @@ def add_entry(doc_id = None):
 
 # Data entry routine
 def get_info(doc_id):
-  record = {"authors":"", "year":"", "title":"", "journal":"", "doi":"", "pubmed":"", "source":""}
+  record = pubdb.blank_record()
   
   if doc_id != "":
     doi = None
@@ -100,6 +101,7 @@ def get_info(doc_id):
 # XML tree navigation helper functions
 
 # gets a "path" of tags, e.g. 'a','b','c' matches c in <a><b><c></c></b></a>
+# because we can't use the XPath library with minidom
 def get_path_element(base, path):
   elem = base
   for path_component in path:
@@ -112,6 +114,7 @@ def get_path_element(base, path):
       raise Exception("Element " + path_component + " not found in " + str(elem))
   return elem
 
+
 # Get the text data in an xml tag
 def get_path_data(base, path):
   return get_path_element(base, path).firstChild.data
@@ -123,7 +126,6 @@ def format_author(first, last):
 
 
 # CrossRef DOI lookup functions
-
 def format_crossref_authors(contributors):
   authors = []
   for person_name in contributors.childNodes:
@@ -183,6 +185,13 @@ def doi_to_pmid(doi):
   r = requests.get(url_doi2pmid, params=params)
   dom = minidom.parseString(r.text.encode('utf-8'))
   return dom.getElementsByTagName("Id")[0].childNodes[0].data
+ 
+
+def getdata(cn):
+  if len(cn) >= 1:
+    return cn[0].data
+  else:
+    return ""
 
 
 # PubMed lookup function
@@ -206,13 +215,26 @@ def get_info_from_pubmed(pmid):
             data['authors'] = pubmed_authors(item)
           elif name == "PubDate":
             # date string example "2010 Apr 13"
-            data['year'] = cn[0].data.split(" ")[0]
+            data['date'] = getdata(cn)
+            data['year'] = getdata(cn).split(" ")[0]
+          elif name == "EPubDate":
+            data['epubdate'] = getdata(cn)
+            if not data['year']:
+              data['year'] = getdata(cn).split(" ")[0]
           elif name == "Title":
-            data['title'] = cn[0].data
+            data['title'] = getdata(cn)
           elif name == "Source":
-            data['journal'] = cn[0].data
+            data['journal_abbrev'] = getdata(cn)
+          elif name == "FullJournalName":
+            data['journal_full'] = getdata(cn)
+          elif name == "Volume":
+            data['volume'] = getdata(cn)
+          elif name == "Issue":
+            data['issue'] = getdata(cn)
+          elif name == "Pages":
+            data['pages'] = getdata(cn)
           elif name == "DOI":
-            data['doi'] = cn[0].data
+            data['doi'] = getdata(cn)
         elif item.nodeType == minidom.Node.ELEMENT_NODE and item.tagName == "Id":
           data['pubmed'] = item.childNodes[0].data
 
