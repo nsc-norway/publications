@@ -17,7 +17,7 @@ record_items = [
     ('doi', 'DOI'),
     ('pubmed', 'PubMed ID'), 
     ('source', 'Source'),
-    ('complete', 'Complete (y/n/"")')
+    ('complete', 'Complete')
     ]
 
 # The source field can be pubmed / crossref / manual

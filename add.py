@@ -79,9 +79,14 @@ def get_info(doc_id):
       pubdb.print_record(record)
       print ""
     
-      answer = raw_input("Add/modify/cancel [A/m/c] ").lower()
+      print "Select i to save as is, but mark as incomplete"
+      answer = raw_input("Add/modify/cancel/incomplete [A/m/c/i] ").lower()
       if (answer == "" or answer == "a"):
         manual = False
+        record['complete'] = 'y'
+      elif answer == "i":
+        manual = False
+        record['complete'] = ''
       elif answer == "m":
         manual = True
       else:
