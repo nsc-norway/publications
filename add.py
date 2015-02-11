@@ -47,7 +47,6 @@ def add_entry(doc_id = None):
 # Main data retrieval routine
 def get_info(doc_id):
   record = pubdb.blank_record()
-  
   if doc_id != "":
     doi = None
     try:
@@ -65,8 +64,13 @@ def get_info(doc_id):
     if pmid:
       print "Getting info from PubMed..."
       data = get_info_from_pubmed(pmid)
-      record['source'] = "pubmed"
-    else:
+      if data['doi'].upper() == doi.upper():
+        record['source'] = "pubmed"
+      else: # This happens :o
+        print "DOI in pubmed doesn't match the one provided, reverting to crossref"
+        record = pubdb.blank_record()
+        pmid = None
+    if not pmid:
       print "Getting info from CrossRef..."
       data = get_info_from_doi(doi)
       record['source'] = "crossref"
@@ -129,9 +133,9 @@ def get_path_data(base, path):
 
 # Data formatting
 def format_author(first, last):
-  strip_lower = "".join(c for c in first if not c.islower())
+  strip_lower = u"".join(c for c in first if not c.islower())
   initials = re.sub(r"[. -]", '', strip_lower, re.UNICODE)[0:2]
-  return str(last) + " " + initials
+  return unicode(last) + u" " + initials
 
 
 # CrossRef DOI lookup functions
@@ -157,15 +161,14 @@ def format_crossref_pages(pages_element):
       if ce.nodeType == minidom.Node.ELEMENT_NODE:
         if ce.tagName == "first_page":
           first = ce.childNodes[0].data
-          print "first page", first
         elif ce.tagName == "last_page":
           last = ce.childNodes[0].data
-          print "larst page", last
   if last and first:
     i = 0
-    while len(last) > 0 and first[i] == last[0]:
-      last = last[1:]
-      i = i + 1
+    if len(last) == len(first):
+      while len(last) > 0 and first[i] == last[0]:
+        last = last[1:]
+        i = i + 1
     if len(last) > 0:
       return first + "-" + last
     else:
@@ -196,7 +199,9 @@ def get_info_from_doi(doi):
         data["authors"] = format_crossref_authors(get_path_element(article, ["contributors"]))
         data["year"] =    get_path_data(article, ["publication_date", "year"])
         data["title"] =   get_path_data(article, ["titles", "title"])
-        data["journal_abbrev"] = get_path_data(journal, ["journal_metadata", "abbrev_title"]).replace(".", "")
+        abbrev = get_path_data(journal, ["journal_metadata", "abbrev_title"])
+        if abbrev:
+          data["journal_abbrev"] = abbrev.replace(".", "")
         data["journal_full"] = get_path_data(journal, ["journal_metadata", "full_title"])
         data["volume"] =  get_path_data(journal, ["journal_issue", "journal_volume", "volume"])
         data["issue"] =  get_path_data(journal, ["journal_issue", "issue"])
@@ -259,11 +264,11 @@ def get_info_from_pubmed(pmid):
           elif name == "PubDate":
             # date string example "2010 Apr 13"
             data['date'] = getdata(cn)
-            data['year'] = getdata(cn).split(" ")[0]
+            if not data.has_key('year'):
+              data['year'] = getdata(cn).split(" ")[0]
           elif name == "EPubDate":
             data['epubdate'] = getdata(cn)
-            if not data['year']:
-              data['year'] = getdata(cn).split(" ")[0]
+            data['year'] = getdata(cn).split(" ")[0]
           elif name == "Title":
             data['title'] = getdata(cn)
           elif name == "Source":
@@ -280,7 +285,7 @@ def get_info_from_pubmed(pmid):
             data['doi'] = getdata(cn)
         elif item.nodeType == minidom.Node.ELEMENT_NODE and item.tagName == "Id":
           data['pubmed'] = item.childNodes[0].data
-
+      
       return data
     else:
       raise Exception("No data for this Pubmed ID.")
@@ -289,8 +294,9 @@ def get_info_from_pubmed(pmid):
   raise Exception("Received status code " + str(r.status_code) + " from server.")
 
 
-if len(sys.argv) > 1:
-  add_entry(sys.argv[1])
-else:
-  add_entry()
+if __name__ == '__main__':
+  if len(sys.argv) > 1:
+    add_entry(sys.argv[1])
+  else:
+    add_entry()
 

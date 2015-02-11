@@ -4,13 +4,13 @@ import datetime, locale
 # Publication tracking database
 
 # columns and display names
-record_items = {
+record_items = [
     ('authors', 'Authors'),
     ('title', 'Title'), 
     ('journal_full', 'Journal full name'),
     ('journal_abbrev', 'Journal abbrev.'),
     ('volume', 'Volume'),
-    ('issue', 'Issue number'),
+    ('issue', 'Issue'),
     ('pages', 'Pages'),
     ('date', 'Publication date'),
     ('epubdate', 'Electr. pub. date'),
@@ -18,12 +18,12 @@ record_items = {
     ('doi', 'DOI'),
     ('pubmed', 'PubMed ID'), 
     ('source', 'Source')
-    }
+    ]
 
 # The source field can be pubmed / crossref / manual
 # There is also column ROWID which is created by sqlite, which acts as the primary key
-record_name = dict(record_items)
 record_data = [a for (a,b) in record_items]
+record_name = dict(record_items)
 columns = ", ".join(record_data)
 
 _conn = False
@@ -120,7 +120,7 @@ def get_records():
   conn = open_db()
   c = conn.cursor()
   recs = []
-  for row in c.execute("SELECT ROWID," + columns + " FROM publications ORDER BY year DESC"):
+  for row in c.execute("SELECT ROWID," + columns + " FROM publications ORDER BY year DESC, ROWID DESC"):
     recs.append(row)
   return recs
 
@@ -136,7 +136,15 @@ def get(row_id):
 def get_by_doi(doi):
   conn = open_db()
   c = conn.cursor()
-  for row in c.execute("SELECT ROWID," + columns + " FROM publications WHERE doi=?", (doi,)):
+  for row in c.execute("SELECT ROWID," + columns + " FROM publications WHERE UPPER(doi)=?", (doi.upper(),)):
+    return row
+  return None
+
+# Get a record identified by PubMed ID
+def get_by_pmid(doi):
+  conn = open_db()
+  c = conn.cursor()
+  for row in c.execute("SELECT ROWID," + columns + " FROM publications WHERE pubmed=?", (doi,)):
     return row
   return None
 
