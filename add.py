@@ -57,8 +57,7 @@ def get_info(doc_id):
  
     if doi:
       try:
-        #pmid = doi_to_pmid(doi)
-        pmid = None
+        pmid = doi_to_pmid(doi)
       except:
         print "PubMed doesn't know about this DOI."
         pmid = None
@@ -130,7 +129,8 @@ def get_path_data(base, path):
 
 # Data formatting
 def format_author(first, last):
-  initials = re.sub('[a-z. -]', '', first)[0:2]
+  strip_lower = "".join(c for c in first if not c.islower())
+  initials = re.sub(r"[. -]", '', strip_lower, re.UNICODE)[0:2]
   return str(last) + " " + initials
 
 
@@ -199,6 +199,7 @@ def get_info_from_doi(doi):
         data["journal_abbrev"] = get_path_data(journal, ["journal_metadata", "abbrev_title"]).replace(".", "")
         data["journal_full"] = get_path_data(journal, ["journal_metadata", "full_title"])
         data["volume"] =  get_path_data(journal, ["journal_issue", "journal_volume", "volume"])
+        data["issue"] =  get_path_data(journal, ["journal_issue", "issue"])
         data["pages"] =   format_crossref_pages(get_path_element(article, ["pages"]))
         data["doi"] =     get_path_data(article, ["doi_data", "doi"])
         return data
