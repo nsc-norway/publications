@@ -6,13 +6,19 @@ if sys.stdout.encoding == 'US-ASCII':
 def view(publication_id):
   row_id = None
   doi = None
+  pmid = None
   try:
     row_id = int(publication_id)
   except:
-    doi = publication_id
+    if publication_id.startswith("P"):
+      pmid = publication_id[1:]
+    else:
+      doi = publication_id
 
   if row_id:
     rec = pubdb.get(row_id)
+  elif pmid:
+    rec = pubdb.get_by_pmid(pmid)
   else:
     rec = pubdb.get_by_doi(doi)
 

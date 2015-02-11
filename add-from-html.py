@@ -9,6 +9,11 @@ htmlfile = open(sys.argv[1]).read()
 entries = htmlfile.split("\n\n")
 
 doc_id = []
+doi_blacklist = [
+  ]
+pmid_blacklist = [
+  "25613625" # incorrect on website, used doi instead
+  ]
 
 # Process a single paragraph of the html, i.e. a publication entry
 def process_entry(e):
@@ -20,7 +25,7 @@ def process_entry(e):
     pmid = pmid_match.group(1)
     if pubdb.get_by_pmid(pmid):
       print "Already have PMID", pmid
-    else:
+    elif pmid not in pmid_blacklist:
       add.add_entry(pmid)
 
   else:
@@ -29,7 +34,7 @@ def process_entry(e):
       doi = doi_match.group(0)
       if pubdb.get_by_doi(doi):
         print "Already have doi", doi
-      else:
+      elif doi not in doi_blacklist:
         add.add_entry(doi)
     else:
       print "No match at all for:"

@@ -1,13 +1,9 @@
 import pubdb, sys, codecs
 
-if sys.stdout.encoding == 'US-ASCII':
-  sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
-
-
 def get_html():
   html = ''
   year = "0"
-  for record in pubdb.get_records():
+  for record in pubdb.get_records("DESC"):
     if record['year'] != year:
       year = record['year']
       html += '\n<p class="MsoNormal">&nbsp;</p>'
@@ -36,7 +32,7 @@ def get_html():
     html += '<a href="http://www.ncbi.nlm.nih.gov/pubmed/?term=' + record['pubmed']
     html += '">' + record['pubmed'] + '</a> </span></p>'
     html += '\n\n'
-  return html
+  return html.encode('utf-8')
     
 
 print get_html()

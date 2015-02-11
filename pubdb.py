@@ -12,12 +12,12 @@ record_items = [
     ('volume', 'Volume'),
     ('issue', 'Issue'),
     ('pages', 'Pages'),
-    ('date', 'Publication date'),
-    ('epubdate', 'Electr. pub. date'),
     ('year', 'Publication year'),
+    ('sortyear', 'Sort year'),
     ('doi', 'DOI'),
     ('pubmed', 'PubMed ID'), 
-    ('source', 'Source')
+    ('source', 'Source'),
+    ('complete', 'Complete (y/n/"")')
     ]
 
 # The source field can be pubmed / crossref / manual
@@ -37,6 +37,10 @@ def print_record(record):
   for ri in record_data:
     rn = record_name[ri]
     print (rn + ":"), " " * (17-len(rn)), record[ri]
+
+def print_brief(record):
+  author = record['authors'].split(',')[0]
+  print u"%4d %s %-20s %-20s %s" % (record['ROWID'], record['sortyear'], author, record['journal_abbrev'], record['doi'])
 
 
 # Interactively modify the record data in memory
@@ -83,11 +87,13 @@ def open_db():
 def check_exists(record):
   conn = open_db()
   c = conn.cursor()
-  for r in c.execute('SELECT '+columns+' FROM publications WHERE doi=?', (record['doi'],)):
-    return r
+  if record.get('doi'):
+    for r in c.execute('SELECT '+columns+' FROM publications WHERE doi=?', (record['doi'],)):
+      return r
 
-  for r in c.execute('SELECT '+columns+' FROM publications WHERE pubmed=?', (record['pubmed'],)):
-    return r
+  if record.get('pubmed'):
+    for r in c.execute('SELECT '+columns+' FROM publications WHERE pubmed=?', (record['pubmed'],)):
+      return r
 
   return None
 
@@ -116,11 +122,11 @@ def set(record):
   
 
 # Get publications ordered by year
-def get_records():
+def get_records(order = "ASC"):
   conn = open_db()
   c = conn.cursor()
   recs = []
-  for row in c.execute("SELECT ROWID," + columns + " FROM publications ORDER BY year DESC, ROWID DESC"):
+  for row in c.execute("SELECT ROWID," + columns + " FROM publications ORDER BY sortyear "+order+", ROWID "+order):
     recs.append(row)
   return recs
 
@@ -147,6 +153,14 @@ def get_by_pmid(doi):
   for row in c.execute("SELECT ROWID," + columns + " FROM publications WHERE pubmed=?", (doi,)):
     return row
   return None
+
+def get_not_complete():
+  conn = open_db()
+  c = conn.cursor()
+  recs = []
+  for row in c.execute("SELECT ROWID," + columns + " FROM publications WHERE (complete <> 'y')"):
+    recs.append(row)
+  return recs
 
 def remove(pub_id):
   conn = open_db()
