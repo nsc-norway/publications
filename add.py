@@ -78,9 +78,16 @@ def get_info(doc_id):
       print ""
       pubdb.print_record(record)
       print ""
-    
-      print "Select i to save as is, but mark as incomplete"
-      answer = raw_input("Add/modify/cancel/incomplete [A/m/c/i] ").lower()
+      duplicate = pubdb.check_exists(record)
+      if duplicate:
+          print "\n\nDUPLICATE: This already exists:"
+          pubdb.print_record(duplicate)
+          print "\n\n--You may still continue, but need to modify conflicting pubmed/doi or it will be rejected"
+          answer = raw_input("Modify/cancel [m/c] ").lower()
+      else:
+          print "Select i to save as is, but mark as incomplete"
+          answer = raw_input("Add/modify/cancel/incomplete [A/m/c/i] ").lower()
+
       if (answer == "" or answer == "a"):
         manual = False
         record['complete'] = 'y'
