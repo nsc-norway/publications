@@ -162,6 +162,16 @@ def get_not_complete():
     recs.append(row)
   return recs
 
+
+def get_number_per_year():
+  conn = open_db()
+  c = conn.cursor()
+  years = []
+  for row in c.execute("SELECT sortyear,COUNT(1) as count FROM publications GROUP BY sortyear ORDER BY sortyear ASC"):
+    years.append((row['sortyear'], row['count']))
+  return years
+
+
 def remove(pub_id):
   conn = open_db()
   c = conn.cursor()
