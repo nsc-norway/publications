@@ -4,8 +4,8 @@ def get_html():
   html = ''
   year = "0"
   for record in pubdb.get_records("DESC"):
-    if record['year'] != year:
-      year = record['year']
+    if record['sortyear'] != year:
+      year = record['sortyear']
       html += '\n<p class="MsoNormal">&nbsp;</p>'
       html += ''
       html += '<p class="MsoNormal"><b>' + year + '</b></p>'
