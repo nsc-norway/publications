@@ -11,23 +11,25 @@ N = len(data)
 
 ind = np.arange(N)    # the x locations for the groups
 width = 0.6       # the width of the bars: can also be len(x) sequence
-figsize=(12,5.5)
+figsize = (12, 5.5)
 plt.figure(figsize=figsize)
 
-p1 = plt.bar(ind, num_publications, width, color=(('r',)*(N-2) + ('#FF8533','#FF8533')))
+p1 = plt.bar(ind, num_publications, width, color=(
+    ('r',) * (N - 2) + ('#FF8533', '#FF8533')))
 
 plt.ylabel('# of publications', fontsize=15)
-plt.title('Peer-reviewed articles based on data delivered by the NSC', fontsize=20, weight='bold')
+plt.title('Peer-reviewed articles based on data delivered by the NSC',
+          fontsize=20, weight='bold')
 
 today = date.today()
 if str(today.year) == years[-1]:
     if today.month < 12:
         years[-1] += " (until " + calendar.month_name[today.month] + ")"
 
-plt.xticks(ind+width/2., years, fontsize=15 )
-plt.yticks(np.arange(0,55,5))
+plt.xticks(ind + width / 2., years, fontsize=15)
+plt.yticks(np.arange(0, 55, 5))
 
-dpi = max(719 / figsize[0], 333 / figsize[1]) # based on number of pixels we want
-plt.savefig('papers_per_year_{:%Y_%m_%d}.png'.format(today),dpi=dpi)
+# based on number of pixels we want
+dpi = max(719 / figsize[0], 333 / figsize[1])
+plt.savefig('papers_per_year_{:%Y_%m_%d}.png'.format(today), dpi=dpi)
 plt.show()
-
