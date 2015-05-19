@@ -32,11 +32,16 @@ def get_html():
             if record['pages']:
                 html += ': ' + record['pages']
         html += '.<br/>'
-        html += '<span style="text-indent: -36pt;">doi: <a href="http://dx.doi.org/'
-        html += record['doi'] + '">' + record['doi'] + '</a> PMID:'
-        html += '<a href="http://www.ncbi.nlm.nih.gov/pubmed/?term=' + \
-            record['pubmed']
-        html += '">' + record['pubmed'] + '</a> </span></p>'
+        html += '<span style="text-indent: -36pt;">'
+        if record['doi']:
+            html += 'doi: <a href="http://dx.doi.org/'
+            html += record['doi'] + '">' + record['doi'] + '</a> '
+        if record['pubmed']:
+            html += 'PMID:'
+            html += '<a href="http://www.ncbi.nlm.nih.gov/pubmed/?term=' + \
+                record['pubmed']
+            html += '">' + record['pubmed'] + '</a> '
+        html += '</span></p>'
         html += '\n\n'
     return html.encode('utf-8')
 
