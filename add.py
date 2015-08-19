@@ -82,7 +82,7 @@ def get_info(doc_id):
             if duplicate:
                 print "\n\nDUPLICATE: This already exists:"
                 pubdb.print_record(duplicate)
-                print "\n\n--You may still continue, but need to modify conflicting pubmed/doi or it will be rejected"
+                print "\n\n--You may still continue, but need to modify the new entry's pubmed/doi or it will be rejected"
                 answer = raw_input("Modify/cancel [m/c] ").lower()
             else:
                 print "Select i to save as is, but mark as incomplete"
