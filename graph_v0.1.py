@@ -24,7 +24,7 @@ plt.title('Peer-reviewed articles based on data delivered by the NSC',
 today = date.today()
 if str(today.year) == years[-1]:
     if today.month < 12:
-        years[-1] += " (until " + calendar.month_name[today.month] + ")"
+        years[-1] += "\n(until " + calendar.month_name[today.month] + ")"
 
 plt.xticks(ind + width / 2., years, fontsize=15)
 plt.yticks(np.arange(0, 55, 5))
