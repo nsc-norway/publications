@@ -2,7 +2,6 @@ import pubdb
 import sys
 import codecs
 
-
 def get_html():
     html = ''
     year = "0"
@@ -46,4 +45,5 @@ def get_html():
     return html.encode('utf-8')
 
 
-print get_html()
+if __name__ == "__main__":
+    print get_html()
