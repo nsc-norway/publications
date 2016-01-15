@@ -102,11 +102,51 @@ def get_crossref_year(article):
         sort_year = print_year
     return (print_year, sort_year)
 
+
+def read_journal(journal):
+    article = get_path_element(journal, ["journal_article"])
+
+    data = {}
+    data["authors"] = format_crossref_authors(
+        get_path_element(article, ["contributors"]))
+    (data["year"], data["sortyear"]) = get_crossref_year(article)
+    data["year"] = get_path_data(
+        article, ["publication_date", "year"])
+    data["title"] = get_path_data(article, ["titles", "title"])
+    abbrev = get_path_data(
+        journal, ["journal_metadata", "abbrev_title"])
+    if abbrev:
+        data["journal_abbrev"] = abbrev.replace(".", "")
+    data["journal_full"] = get_path_data(
+        journal, ["journal_metadata", "full_title"])
+    data["volume"] = get_path_data(
+        journal, ["journal_issue", "journal_volume", "volume"])
+    data["issue"] = get_path_data(
+        journal, ["journal_issue", "issue"])
+    data["pages"] = format_crossref_pages(
+        get_path_element(article, ["pages"]))
+    data["doi"] = get_path_data(article, ["doi_data", "doi"])
+    return data
+
+def read_report(report):
+    md = get_path_element(report, ["report-paper_metadata"])
+    data = {}
+    data["authors"] = format_crossref_authors(
+        get_path_element(md, ["contributors"]))
+    data["year"] = data["sortyear"] = get_path_data(
+        md, ["publication_date", "year"])
+    data["title"] = get_path_data(md, ["titles", "title"])
+    data["doi"] = get_path_data(md, ["doi_data", "doi"])
+    data["journal_full"] = "bioRxiv" if data["doi"].startswith("10.1101") else "(report)"
+    data["journal_abbrev"] = data["journal_full"]
+    data["volume"] = ""
+    data["issue"] = ""
+    data["pages"] = ""
+    return data
+
 # Main function for looking up a DOI
 # example
 # https://doi.crossref.org/servlet/query?pid=marius.bjornstad@medisin.uio.no&format=unixsd&id=10.3389/fmicb.2015.00017
-
-
 def get_info_from_doi(doi):
     params = {"pid": "marius.bjornstad@medisin.uio.no",
               "format": "unixsd", "id": doi}
@@ -119,31 +159,17 @@ def get_info_from_doi(doi):
         if len(query) == 1:
             q = query[0]
             if q.getAttribute("status") == "resolved":
-                data = {}
                 journal = get_path_element(
                     q, ["doi_record", "crossref", "journal"])
-                article = get_path_element(journal, ["journal_article"])
-
-                data["authors"] = format_crossref_authors(
-                    get_path_element(article, ["contributors"]))
-                (data["year"], data["sortyear"]) = get_crossref_year(article)
-                data["year"] = get_path_data(
-                    article, ["publication_date", "year"])
-                data["title"] = get_path_data(article, ["titles", "title"])
-                abbrev = get_path_data(
-                    journal, ["journal_metadata", "abbrev_title"])
-                if abbrev:
-                    data["journal_abbrev"] = abbrev.replace(".", "")
-                data["journal_full"] = get_path_data(
-                    journal, ["journal_metadata", "full_title"])
-                data["volume"] = get_path_data(
-                    journal, ["journal_issue", "journal_volume", "volume"])
-                data["issue"] = get_path_data(
-                    journal, ["journal_issue", "issue"])
-                data["pages"] = format_crossref_pages(
-                    get_path_element(article, ["pages"]))
-                data["doi"] = get_path_data(article, ["doi_data", "doi"])
-                return data
+                if journal: # It's a journal article
+                    return read_journal(journal)
+                else:
+                    report = get_path_element(q, 
+                            ["doi_record", "crossref", "report-paper"])
+                    if report:
+                        return read_report(report)
+                    else:
+                        raise RuntimeError("Received an unexpected type of document from CrossRef")
             else:  # status != resolved
                 raise Exception("Unable to resolve the DOI")
 
