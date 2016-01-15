@@ -20,5 +20,5 @@ with open("index.html", "w") as f:
 import graph #execute it
 
 print "Upload index.html and papers_per_year.png to the WebDAV at:"
-print "https://www-dav.sequencing.uio.no/"
+print "https://www-dav.sequencing.uio.no/publications/"
 
