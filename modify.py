@@ -2,8 +2,7 @@ import pubdb
 import sys
 import codecs
 
-if sys.stdout.encoding == 'US-ASCII':
-    sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
+sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
 
 
 def modify(publication_id):
