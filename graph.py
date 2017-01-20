@@ -35,7 +35,7 @@ if str(today.year) == years[-1]:
 
 plt.xticks(ind + width / 2., years, fontsize=15)
 plt.yticks(np.arange(0, 70, 5))
-plt.ylim((0, 55))
+plt.ylim((0, 60))
 
 # based on number of pixels we want
 dpi = max(719 / figsize[0], 333 / figsize[1])
