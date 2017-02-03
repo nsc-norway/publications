@@ -34,8 +34,8 @@ if str(today.year) == years[-1]:
         years[-1] += "\n(until " + calendar.month_name[today.month] + ")"
 
 plt.xticks(ind + width / 2., years, fontsize=15)
-plt.yticks(np.arange(0, 80, 5))
-plt.ylim((0, 80))
+plt.yticks(np.arange(0, 85, 5))
+plt.ylim((0, 85))
 
 # based on number of pixels we want
 dpi = max(719 / figsize[0], 333 / figsize[1])
