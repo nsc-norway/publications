@@ -37,6 +37,13 @@ plt.xticks(ind + width / 2. - 0.3, years, fontsize=15)
 plt.yticks(np.arange(0, 85, 5))
 plt.ylim((0, 85))
 
+
+# Labels above the bar
+for rect in p1:
+    height = rect.get_height()
+    plt.text(rect.get_x() + rect.get_width()/2., height + 1,'%d' % int(height), ha='center', va='bottom')
+
+
 # based on number of pixels we want
 dpi = max(719 / figsize[0], 333 / figsize[1])
 #plt.savefig('papers_per_year_{:%Y_%m_%d}.png'.format(today), dpi=dpi)
