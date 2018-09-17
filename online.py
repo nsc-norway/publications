@@ -172,7 +172,7 @@ def get_info_from_doi(doi):
                         raise RuntimeError("Received an unexpected type of from CrossRef for DOI {0}.".format(
                             doi))
             else:  # status != resolved
-                raise Exception("Unable to resolve the DOI")
+                raise Exception("Unable to resolve the DOI {0}".format(doi))
 
     raise Exception(
         "The CrossRef server returned invalid data or an error status")
