@@ -34,8 +34,8 @@ if str(today.year) == years[-1]:
         years[-1] += "\n(until " + calendar.month_name[today.month] + ")"
 
 plt.xticks(ind + width / 2. - 0.3, years, fontsize=15)
-plt.yticks(np.arange(0, 100, 5))
-plt.ylim((0, 100))
+plt.yticks(np.arange(0, 105, 5))
+plt.ylim((0, 105))
 
 
 # Labels above the bar
