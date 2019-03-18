@@ -47,5 +47,5 @@ for rect in p1:
 # based on number of pixels we want
 dpi = max(719 / figsize[0], 333 / figsize[1])
 #plt.savefig('papers_per_year_{:%Y_%m_%d}.png'.format(today), dpi=dpi)
-plt.savefig('papers_per_year.png', dpi=dpi)
+plt.savefig('papers_per_year.png', dpi=dpi, transparent=True)
 plt.show()
