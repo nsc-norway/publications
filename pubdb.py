@@ -44,7 +44,10 @@ def print_record(record):
 
 def print_brief(record):
     author = record['authors'].split(',')[0]
-    print u"%4d %s %-20s %-20s %s" % (record['ROWID'], record['sortyear'], author, record['journal_abbrev'], record['doi'])
+    print u"%4d %s %8s %1s %-20s %-20s %40s" % (record['ROWID'], record['sortyear'],
+                                            record['pubmed'], record['complete'], author,
+                                            record['journal_abbrev'], record['doi']
+                                            )
 
 
 # Interactively modify the record data in memory
