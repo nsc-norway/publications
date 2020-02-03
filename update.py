@@ -15,7 +15,15 @@ for ei in entries:
     e = dict(ei)
     e['ROWID'] = ei['ROWID']
     if e.get("pubmed"):
-        rec = online.get_info_from_pubmed(e['pubmed'])
+        pmid = e['pubmed']
+    else:
+        try:
+            pmid = online.doi_to_pmid(e['doi'])
+        except:
+            pmid = None
+    if pmid:
+        rec = online.get_info_from_pubmed(pmid)
+        rec['source'] = "pubmed"
     elif e.get("doi"):
         rec = online.get_info_from_doi(e['doi'])
 
