@@ -26,7 +26,7 @@ def process_entry(e):
     if pmid_match:
         pmid = pmid_match.group(1)
         if pubdb.get_by_pmid(pmid):
-            print "Already have PMID", pmid
+            print("Already have PMID", pmid)
         elif pmid not in pmid_blacklist:
             add.add_entry(pmid)
 
@@ -35,14 +35,13 @@ def process_entry(e):
         if doi_match:
             doi = doi_match.group(0)
             if pubdb.get_by_doi(doi):
-                print "Already have doi", doi
+                print("Already have doi", doi)
             elif doi not in doi_blacklist:
                 add.add_entry(doi)
         else:
-            print "No match at all for:"
-            print e
-            choice = raw_input(
-                "Enter doi, pmid, m to enter manually or enter to skip: ")
+            print("No match at all for:")
+            print(e)
+            choice = input("Enter doi, pmid, m to enter manually or enter to skip: ")
             if choice == "m":
                 add.add_entry()
             elif choice != "":
@@ -52,12 +51,12 @@ def process_entry(e):
 # Looping over the HTML file
 for i, e in enumerate(reversed(entries)):
     n_i_end = e.count("</i>")
-    print "Entry (%d/%d):" % (i + 1, len(entries))
+    print("Entry (%d/%d):" % (i + 1, len(entries)))
     if n_i_end == 0:
-        # print "\n\n not a paper? ", e
+        # print("\n\n not a paper? ", e
         pass
     elif n_i_end == 1:
         process_entry(e)
     else:
-        print "MULTI-PAPER!!"
+        print("MULTI-PAPER!!")
         sys.exit(1)

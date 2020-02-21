@@ -2,8 +2,7 @@ import pubdb
 import sys
 import codecs
 
-sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
-
+sys.stdout.reconfigure(encoding='utf-8')
 
 def mark_complete_incomplete():
     for record in pubdb.get_records():

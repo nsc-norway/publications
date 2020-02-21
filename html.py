@@ -46,4 +46,4 @@ def get_html():
 
 
 if __name__ == "__main__":
-    print get_html()
+    print(get_html())

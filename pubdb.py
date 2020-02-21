@@ -39,15 +39,15 @@ def blank_record():
 def print_record(record):
     for ri in record_data:
         rn = record_name[ri]
-        print (rn + ":"), " " * (17 - len(rn)), record[ri]
+        print((rn + ":"), " " * (17 - len(rn)), record[ri])
 
 
 def print_brief(record):
     author = record['authors'].split(',')[0]
-    print u"%4d %s %8s %1s %-20s %-20s %40s" % (record['ROWID'], record['sortyear'],
+    print(u"%4d %s %8s %1s %-20s %-20s %40s" % (record['ROWID'], record['sortyear'],
                                             record['pubmed'], record['complete'], author,
                                             record['journal_abbrev'], record['doi']
-                                            )
+                                            ))
 
 
 # Interactively modify the record data in memory

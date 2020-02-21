@@ -15,27 +15,27 @@ sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
 # Main function
 def add_entry(doc_id=None):
 
-    print ""
-    print "Add a publication to the database"
-    print ""
+    print("")
+    print("Add a publication to the database")
+    print("")
 
     if not doc_id:
         doc_id = raw_input("Enter DOI or PubMed ID, or blank to skip: ")
 
     record = get_info(doc_id)
-    print ""
+    print("")
 
     duplicate = pubdb.check_exists(record)
     if duplicate:
-        print ""
-        print "ABORTED. Specified publication is already in database. Existing record:"
+        print("")
+        print("ABORTED. Specified publication is already in database. Existing record:")
         pubdb.print_record(duplicate)
-        print ""
+        print("")
     else:
         pubdb.add(record)
-        print ""
-        print "Saved."
-        print ""
+        print("")
+        print("Saved.")
+        print("")
 
 
 # Main data retrieval routine
@@ -53,20 +53,20 @@ def get_info(doc_id):
             try:
                 pmid = online.doi_to_pmid(doi)
             except:
-                print "PubMed doesn't know about this DOI."
+                print("PubMed doesn't know about this DOI.")
                 pmid = None
 
         if pmid:
-            print "Getting info from PubMed..."
+            print("Getting info from PubMed...")
             data = online.get_info_from_pubmed(pmid)
             if not doi or (data.has_key('doi') and data['doi'].upper() == doi.upper()):
                 record['source'] = "pubmed"
             else:  # This happens :o
-                print "DOI in pubmed doesn't match the one provided, reverting to crossref"
+                print("DOI in pubmed doesn't match the one provided, reverting to crossref")
                 record = pubdb.blank_record()
                 pmid = None
         if not pmid:
-            print "Getting info from CrossRef..."
+            print("Getting info from CrossRef...")
             data = online.get_info_from_doi(doi)
             record['source'] = "crossref"
 
@@ -74,18 +74,18 @@ def get_info(doc_id):
             record[k] = v
 
         if record['source'] != '':
-            print " ** Retrieved publication data ** "
-            print ""
+            print(" ** Retrieved publication data ** ")
+            print("")
             pubdb.print_record(record)
-            print ""
+            print("")
             duplicate = pubdb.check_exists(record)
             if duplicate:
-                print "\n\nDUPLICATE: This already exists:"
+                print("\n\nDUPLICATE: This already exists:")
                 pubdb.print_record(duplicate)
-                print "\n\n--You may still continue, but need to modify the new entry's pubmed/doi or it will be rejected"
+                print("\n\n--You may still continue, but need to modify the new entry's pubmed/doi or it will be rejected")
                 answer = raw_input("Modify/cancel [m/c] ").lower()
             else:
-                print "Select i to save as is, but mark as incomplete"
+                print("Select i to save as is, but mark as incomplete")
                 answer = raw_input(
                     "Add/modify/cancel/incomplete [A/m/c/i] ").lower()
 
@@ -98,7 +98,7 @@ def get_info(doc_id):
             elif answer == "m":
                 manual = True
             else:
-                print "\nCancelled.\n"
+                print("\nCancelled.\n")
                 sys.exit(1)
 
     if manual:
