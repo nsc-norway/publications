@@ -7,7 +7,7 @@ import pubdb
 data = pubdb.get_number_per_year()
 num_publications = [d[1] for d in data]
 for y, p in data:
-    print str(y) + "\t" + str(p)
+    print(str(y) + "\t" + str(p))
 years = [d[0] for d in data]
 N = len(data)
 today = date.today()
