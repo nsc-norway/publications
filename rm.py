@@ -8,7 +8,7 @@ def rm(pub_id):
     record = pubdb.get(pub_id)
     author = record['authors'].split(',')[0]
     print("%4d %s %-20s %-20s %s" % (record['ROWID'], record['year'], author, record['journal_abbrev'], record['doi']))
-    ans = raw_input("Delete? [Y/n] ")
+    ans = input("Delete? [Y/n] ")
     if ans.lower() == "y" or ans == "":
         pubdb.remove(pub_id)
         print("\nRemoved.\n")

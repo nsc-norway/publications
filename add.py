@@ -9,7 +9,7 @@ import online
 
 
 # Set output encoding to allow international characters
-sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
+sys.stdout.reconfigure(encoding='utf-8')
 
 
 # Main function
@@ -20,7 +20,7 @@ def add_entry(doc_id=None):
     print("")
 
     if not doc_id:
-        doc_id = raw_input("Enter DOI or PubMed ID, or blank to skip: ")
+        doc_id = input("Enter DOI or PubMed ID, or blank to skip: ")
 
     record = get_info(doc_id)
     print("")
@@ -59,7 +59,7 @@ def get_info(doc_id):
         if pmid:
             print("Getting info from PubMed...")
             data = online.get_info_from_pubmed(pmid)
-            if not doi or (data.has_key('doi') and data['doi'].upper() == doi.upper()):
+            if not doi or ('doi' in data and data['doi'].upper() == doi.upper()):
                 record['source'] = "pubmed"
             else:  # This happens :o
                 print("DOI in pubmed doesn't match the one provided, reverting to crossref")
@@ -83,11 +83,10 @@ def get_info(doc_id):
                 print("\n\nDUPLICATE: This already exists:")
                 pubdb.print_record(duplicate)
                 print("\n\n--You may still continue, but need to modify the new entry's pubmed/doi or it will be rejected")
-                answer = raw_input("Modify/cancel [m/c] ").lower()
+                answer = input("Modify/cancel [m/c] ").lower()
             else:
                 print("Select i to save as is, but mark as incomplete")
-                answer = raw_input(
-                    "Add/modify/cancel/incomplete [A/m/c/i] ").lower()
+                answer = input("Add/modify/cancel/incomplete [A/m/c/i] ").lower()
 
             if (answer == "" or answer == "a"):
                 manual = False

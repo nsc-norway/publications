@@ -37,8 +37,7 @@ for ei in entries:
     else:
         print("Updated record:")
         pubdb.print_record(e)
-        resp = raw_input(
-            "Enter new complete status (y/n)? [" + e['complete'] + "] ")
+        resp = input("Enter new complete status (y/n)? [" + e['complete'] + "] ")
         if resp != "":
             e['complete'] = resp
     pubdb.set(e)

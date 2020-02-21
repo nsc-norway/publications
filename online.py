@@ -36,7 +36,7 @@ def get_path_data(base, path):
 def format_author(first, last):
     strip_lower = u"".join(c for c in first if not c.islower())
     initials = re.sub(r"[. -]", '', strip_lower, re.UNICODE)[0:2]
-    return unicode(last) + u" " + initials
+    return last + " " + initials
 
 
 # CrossRef DOI lookup functions
@@ -230,13 +230,13 @@ def get_info_from_pubmed(pmid):
                         printyear = getdata(cn).split(" ")[0]
                         if printyear:
                             data['year'] = printyear
-                            if not data.has_key("sortyear"):
+                            if not "sortyear" in data:
                                 data['sortyear'] = printyear
                     elif name == "EPubDate":
                         epubyear = getdata(cn).split(" ")[0]
                         if epubyear:
                             data['sortyear'] = epubyear
-                            if not data.has_key("year"):
+                            if not "year" in data:
                                 data['year'] = epubyear
                     elif name == "Title":
                         data['title'] = getdata(cn)

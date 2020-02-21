@@ -6,7 +6,7 @@ constant_html = '<p class=\"MsoNormal\" style=\"margin-left:36.0pt;text-indent:-
 
 content = constant_html + html.get_html()
 
-with open("index.html", "w") as f:
+with open("index.html", "w", encoding='utf-8') as f:
     f.write("""{
    "resourcetype": "structured-article",
    "properties": {
