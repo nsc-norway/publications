@@ -1,0 +1,28 @@
+====================================
+Demo av UiO rst til Vortex artikkel
+====================================
+
+.. uio-meta::
+   :responsible-name: Arvind Sundaram
+   :responsible-email: arvind.sundaram@medisin.uio.no
+
+.. uio-introduction::
+
+.. contents::
+
+.. section-numbering::
+
+.. image:: papers_per_year.png.jpeg
+   :alt: {{ year_count_string }}
+   :align: right
+
+
+In case we had missed your publication in the list below, please let us know through our publication registration form.
+
+{% for year, publications in publication_list %}
+
+{{ year }}
+=======================
+Med litt tekst.
+
+{% endfor %}
