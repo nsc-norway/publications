@@ -42,8 +42,8 @@ def get_html():
             html += '">' + record['pubmed'] + '</a> '
         html += '</span></p>'
         html += '\n\n'
-    return html.encode('utf-8')
+    return html
 
 
 if __name__ == "__main__":
-    print get_html()
+    print(get_html())

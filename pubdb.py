@@ -39,15 +39,15 @@ def blank_record():
 def print_record(record):
     for ri in record_data:
         rn = record_name[ri]
-        print (rn + ":"), " " * (17 - len(rn)), record[ri]
+        print((rn + ":"), " " * (17 - len(rn)), record[ri])
 
 
 def print_brief(record):
     author = record['authors'].split(',')[0]
-    print u"%4d %s %8s %1s %-20s %-20s %40s" % (record['ROWID'], record['sortyear'],
+    print("%4d %s %8s %1s %-20s %-20s %40s" % (record['ROWID'], record['sortyear'],
                                             record['pubmed'], record['complete'], author,
                                             record['journal_abbrev'], record['doi']
-                                            )
+                                            ))
 
 
 # Interactively modify the record data in memory
@@ -62,9 +62,9 @@ def modify_record(record):
             continue  # don't modify the source
         rn = record_name[ri]
         if record[ri]:
-            rd = unicode(raw_input(rn + " [" + record[ri] + "]: "), 'utf8')
+            rd = input(rn + " [" + record[ri] + "]: ")
         else:
-            rd = unicode(raw_input(rn + ": "), 'utf8')
+            rd = input(rn + ": ")
         if rd != "":
             new_rec[ri] = rd
     return new_rec
@@ -119,11 +119,9 @@ def add(record):
 def set(record):
     conn = open_db()
     c = conn.cursor()
-    sql = "UPDATE publications SET "
     values = []
     for col in record_data:
         values.append(record[col])
-    nval = len(values)
     assign = ", ".join(rec_id + "=?" for rec_id in record_data)
     c.execute("UPDATE publications SET " + assign +
               " WHERE ROWID=?", tuple(values + [record['ROWID']]))

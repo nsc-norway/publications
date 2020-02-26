@@ -6,7 +6,7 @@ import sys
 import pubdb
 import online
 
-sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
+sys.stdout.reconfigure(encoding='utf-8')
 
 entries = pubdb.get_not_complete()
 
@@ -35,10 +35,9 @@ for ei in entries:
     if e['complete'] == "" and (rec['volume'] or rec['issue'] or rec['pages']):
         e['complete'] = 'y'
     else:
-        print "Updated record:"
+        print("Updated record:")
         pubdb.print_record(e)
-        resp = raw_input(
-            "Enter new complete status (y/n)? [" + e['complete'] + "] ")
+        resp = input("Enter new complete status (y/n)? [" + e['complete'] + "] ")
         if resp != "":
             e['complete'] = resp
     pubdb.set(e)

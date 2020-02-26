@@ -2,7 +2,7 @@ import pubdb
 import sys
 import codecs
 
-sys.stdout = codecs.getwriter('utf-8')(sys.stdout)
+sys.stdout.reconfigure(encoding='utf-8')
 
 
 def view(publication_id):
@@ -27,11 +27,11 @@ def view(publication_id):
     if rec:
         pubdb.print_record(rec)
     else:
-        print "record not found"
+        print("record not found")
         sys.exit(1)
 
 if len(sys.argv[1]) >= 1:
     view(sys.argv[1])
 else:
-    print "use: view.py {row_id|doi}"
+    print("use: view.py {row_id|doi}")
     sys.exit(1)
