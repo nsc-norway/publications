@@ -2,48 +2,70 @@ import pubdb
 import sys
 import codecs
 
-def get_html():
-    html = ''
+
+top_of_page = """
+====================================
+Publications
+====================================
+
+.. uio-meta::
+   :responsible-name: Arvind Sundaram / Marius Bjørnstad
+   :responsible-email: post@seuencing.uio.no
+   :image: papers_per_year.png
+
+.. uio-introduction::
+
+  Her er en ingress.
+
+.. contents::
+
+.. section-numbering::
+
+In case we had missed your publication in the list below, please let us know
+through our `publication registration form 
+<https://nettskjema.uio.no/answer/61221.html>`.
+
+
+Første hovedavsnitt
+=======================
+Med litt tekst
+
+Andre hovedavsnitt
+=======================
+Med litt tekst også.
+"""
+
+def get_doc():
+    output = top_of_page
     year = "0"
     for record in pubdb.get_records("DESC"):
         if record['sortyear'] != year:
             year = record['sortyear']
-            html += '\n<p class="MsoNormal">&nbsp;</p>'
-            html += ''
-            html += '<p class="MsoNormal"><b>' + year + '</b></p>'
-            html += '\n\n'
+            output += year + "\n"
+            output += "=========="
 
-        # First line on normal left margin, next lines indented
-        html += '<p class="MsoNormal" style="margin-left:36.0pt;text-indent:-36.0pt"><span style="mso-ascii-font-family:Cambria;mso-hansi-font-family:Cambria;mso-no-proof:yes">'
-        # Authors, year and title
-        html += record['authors'] + ". " + \
-            record['year'] + ". " + record['title']
+        # Authors, year and title        
+        output += "| " + record['authors'] + ". " + record['year'] + ". " + record['title']
         # Trailing full stop for title
         if record['title'][-1] != ".":
-            html += '.'
-        html += '</span> '
+            output += '.'
         # Journal in italics
-        html += '<i style="text-indent: -36pt;">' + \
-            record['journal_abbrev'] + '</i>'
+        output += '*' + record['journal_abbrev'] + '*'
         if record['volume']:
-            html += ' ' + record['volume']
-            # if record['issue']: don't print issue number
+            output += ' ' + record['volume']
             if record['pages']:
                 html += ': ' + record['pages']
-        html += '.<br/>'
-        html += '<span style="text-indent: -36pt;">'
+        output += "| " # To make a new line
         if record['doi']:
-            html += 'doi: <a href="http://dx.doi.org/'
-            html += record['doi'] + '">' + record['doi'] + '</a> '
+            output += 'doi: `{}<http://dx.doi.org/{}>`_ '.format(
+                record['doi'], record['doi'])
         if record['pubmed']:
-            html += 'PMID:'
-            html += '<a href="http://www.ncbi.nlm.nih.gov/pubmed/?term=' + \
-                record['pubmed']
-            html += '">' + record['pubmed'] + '</a> '
-        html += '</span></p>'
-        html += '\n\n'
-    return html
+            output += 'PMID: `{}<http://www.ncbi.nlm.nih.gov/pubmed/?term={}>`_'.format(
+                record['pubmed'], record['pubmed']
+            )
+        output += '\n\n'
+    return output
 
 
 if __name__ == "__main__":
-    print(get_html())
+    print(get_doc())
