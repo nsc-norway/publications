@@ -1,0 +1,6 @@
+name: pub
+channels:
+  - defaults
+dependencies:
+  - numpy
+  - matplotlib
