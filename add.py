@@ -4,6 +4,7 @@ import codecs
 import locale
 import pubdb
 import online
+import re
 
 # Script to add an entry to the publications database
 
@@ -47,7 +48,7 @@ def get_info(doc_id):
         try:
             pmid = str(int(doc_id))  # if numeric, assume PMID
         except ValueError:
-            doi = doc_id  # otherwise, it's a DOI
+            doi = re.sub(r"^https?://doi.org/", "", doc_id)  # otherwise, it's a DOI
 
         if doi:
             try:
