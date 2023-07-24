@@ -19,6 +19,6 @@ with open("index.html", "w", encoding='utf-8') as f:
 
 import graph #execute it
 
-print("Upload index.html and papers_per_year.png to the WebDAV at:")
-print("https://www-dav.sequencing.uio.no/publications/")
+print("Upload index.html and papers_per_year.png to the website management UI at:")
+print("https://www-adm.sequencing.uio.no/publications/?vrtx=admin")
 
