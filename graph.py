@@ -33,8 +33,8 @@ if str(today.year) == years[-1]:
     if today.month < 12:
         years[-1] += "\n(until " + calendar.month_name[today.month] + ")"
 
-plt.xticks(ind + width / 2. - 0.3, years, fontsize=15)
-plt.yticks(np.arange(0, 140, 5))
+plt.xticks(ind + width / 2. - 0.3, years, fontsize=10)
+plt.yticks(np.arange(0, 140, 10))
 plt.ylim((0, 140))
 
 
